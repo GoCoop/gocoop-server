@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Server) GetCoops(w http.ResponseWriter, req *http.Request) {
-	log.Println("> GET request to /categories")
+	log.Println("> GET request to /coops")
 
 	coop := models.Coops{}
 	coops, err := coop.GetCoops(s.DB)

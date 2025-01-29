@@ -22,8 +22,10 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /categories", s.GetCategories)
 	mux.HandleFunc("GET /coops", s.GetCoops)
+	mux.HandleFunc("GET /coops/{name}", s.GetCoopDetails)
+
+	mux.HandleFunc("GET /categories", s.GetCategories)
 
 	log.Println("> Server started! Running on port 8080.")
 	log.Fatal(http.ListenAndServe(":8080", mux))

@@ -22,7 +22,6 @@ func ConnectToDatabase() *pgxpool.Pool {
 
 	encodedPw := url.QueryEscape(dbPassword)
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", dbUser, encodedPw, dbHost, dbPort, dbName)
-	fmt.Println(connStr)
 
 	dbpool, err := pgxpool.New(context.Background(), connStr)
 	if err != nil {

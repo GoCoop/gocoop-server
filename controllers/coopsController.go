@@ -10,8 +10,7 @@ import (
 func (s *Server) GetCoops(w http.ResponseWriter, req *http.Request) {
 	log.Println("> GET request to /coops")
 
-	coop := models.Coops{}
-	coops, err := coop.GetCoops(s.DB)
+	coops, err := models.GetCoops(s.DB)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{
@@ -22,5 +21,5 @@ func (s *Server) GetCoops(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(*coops)
+	json.NewEncoder(w).Encode(coops)
 }

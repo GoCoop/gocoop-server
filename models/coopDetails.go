@@ -11,7 +11,7 @@ import (
 type CoopDetails struct {
 	ID         int    `json:"id"`
 	Name       string `json:"name"`
-	ImageUrl   string `json:"imageUrl"`
+	ImageURL   string `json:"imageURL"`
 	Category   string `json:"category"`
 	ShortDesc  string `json:"shortDesc"`
 	Desc       string `json:"desc"`
@@ -28,7 +28,7 @@ func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, pathV string) (CoopDetail
 		SELECT 
 			1 AS id, 
 			'Agraria' AS name, 
-			'' AS imageUrl, 
+			'/agraria-logo.jpg' AS imageURL, 
 			'industry' AS category, 
 			'Cooperativa' AS shortDesc, 
 			'desc' AS desc, 

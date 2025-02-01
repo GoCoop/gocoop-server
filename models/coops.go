@@ -13,7 +13,7 @@ type Coops struct {
 	Name     string `json:"name"`
 	Category string `json:"category"`
 	Desc     string `json:"desc"`
-	ImageURL string `json:"imageUrl"`
+	ImageURL string `json:"imageURL"`
 }
 
 func GetCoops(db *pgxpool.Pool) ([]Coops, error) {
@@ -23,7 +23,7 @@ func GetCoops(db *pgxpool.Pool) ([]Coops, error) {
 			'agraria' AS name,
 			'industry' AS category,
 			'Cooperativa industrial.' AS desc,
-			'' AS ImageURL
+			'/agraria-logo.jpg' AS ImageURL
 	`
 
 	rows, err := db.Query(context.Background(), query)

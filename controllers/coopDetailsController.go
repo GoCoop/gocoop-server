@@ -8,8 +8,8 @@ import (
 )
 
 func (s *Server) GetCoopDetails(w http.ResponseWriter, req *http.Request) {
-	log.Println("> GET requests to /coopDetails")
 	pv := req.PathValue("name")
+	log.Printf("> GET request to /coops/%s\n", pv)
 
 	details := models.CoopDetails{}
 	coopDetails, err := details.GetCoopDetails(s.DB, pv)

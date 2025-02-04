@@ -17,15 +17,15 @@ type Categories struct {
 func GetCategories(db *pgxpool.Pool) ([]Categories, error) {
 
 	query := `
-		SELECT
-			1 					AS id,
-			'Indústria' AS name,
-			'industry' 	AS icon
-		UNION
-		SELECT
-			2 					AS id,
-			'Cerveja' 	AS name,
-			'beer' 			AS icon
+		SELECT 
+			c.id,
+			ct.name,
+			c.name AS icon
+		FROM t_categories c
+		JOIN t_categories_translations ct ON
+			c.id = ct.category_id
+		WHERE
+			ct.language_id = 1
 	`
 
 	rows, err := db.Query(context.Background(), query)

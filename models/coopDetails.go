@@ -9,32 +9,52 @@ import (
 )
 
 type CoopDetails struct {
-	ID         int    `json:"id"`
-	Name       string `json:"name"`
-	ImageURL   string `json:"imageURL"`
-	Category   string `json:"category"`
-	ShortDesc  string `json:"shortDesc"`
-	Desc       string `json:"desc"`
-	Location   string `json:"location"`
-	WebsiteURL string `json:"websiteURL"`
-	Workers    int    `json:"workers"`
+	ID          int      `json:"id"`
+	Name        string   `json:"name"`
+	Categories  []string `json:"categories"`
+	ImageURL    string   `json:"image_url"`
+	WebsiteURL  string   `json:"website_url"`
+	Workers     int      `json:"workers"`
+	ShortDesc   string   `json:"short_desc"`
+	Description string   `json:"description"`
+	Country     string   `json:"country"`
 }
 
 func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, pathV string) (CoopDetails, error) {
-	fmt.Println(pathV) // Will be used inside SELECT query
+	fmt.Println(pathV)
 
-	// Example query
 	query := `
-		SELECT 
-			1 AS id, 
-			'Agraria' AS name, 
-			'/agraria-logo.jpg' AS imageURL, 
-			'industry' AS category, 
-			'Cooperativa' AS shortDesc, 
-			'desc' AS desc, 
-			'Brasil' AS location, 
-			'' AS websiteURL,
-			400 AS workers`
+		SELECT
+			c.id,
+			cd.name,
+			JSONB_AGG(cat.name) AS categories,
+			cd.image_url as image_url,
+			cd.website_url AS website_url,
+			cd.workers AS workers,
+			cdt.short_desc,
+			cdt.description,
+			cdt.country
+		FROM t_coops c
+		JOIN t_coop_details cd ON
+			c.id = cd.id
+		JOIN t_coops_categories cc ON
+			cc.coop_id = c.id
+		JOIN t_categories cat ON
+			cat.id = cc.category_id
+		JOIN t_coop_details_translations cdt ON
+			cd.id = cdt.coop_id
+		WHERE
+			c.slug = 'agraria'
+			AND cdt.language_id = 1
+		GROUP BY
+			c.id, 
+			cd.name, 
+			cd.image_url, 
+			cd.website_url, 
+			cd.workers,
+			cdt.short_desc,
+			cdt.description,
+			cdt.country;`
 
 	rows, err := db.Query(context.Background(), query)
 	if err != nil {

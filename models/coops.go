@@ -9,22 +9,37 @@ import (
 )
 
 type Coops struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	Category string `json:"category"`
-	Desc     string `json:"desc"`
-	ImageURL string `json:"imageURL"`
+	ID        int    `json:"id"`
+	Slug      string `json:"slug"`
+	Name      string `json:"name"`
+	Category  string `json:"category"`
+	ShortDesc string `json:"short_desc"`
+	ImageURL  string `json:"image_url"`
 }
 
 func GetCoops(db *pgxpool.Pool) ([]Coops, error) {
 	query := `
 		SELECT
-			1 AS ID,
-			'agraria' AS name,
-			'industry' AS category,
-			'Cooperativa industrial.' AS desc,
-			'/agraria-logo.jpg' AS ImageURL
-	`
+			c.id,
+			c.slug,
+			cd.name,
+			cat.name AS category,
+			cd.image_url,
+			cdt.short_desc
+		FROM t_coops c 
+		JOIN t_coop_details cd ON
+			cd.id = c.id
+		JOIN t_coop_details_translations cdt ON
+			cdt.coop_id = cd.id
+		JOIN t_coops_categories cc ON
+			cc.coop_id = cd.id
+		JOIN t_categories cat ON
+			cat.id = cc.category_id
+		WHERE
+			c.slug LIKE '%agraria%'
+			AND cdt.language_id = 2
+			AND cat.id = 1
+		`
 
 	rows, err := db.Query(context.Background(), query)
 	if err != nil {

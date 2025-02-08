@@ -8,16 +8,21 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+type CategoriesData struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 type CoopDetails struct {
-	ID          int      `json:"id"`
-	Name        string   `json:"name"`
-	Categories  []string `json:"categories"`
-	ImageURL    string   `json:"image_url"`
-	WebsiteURL  string   `json:"website_url"`
-	Workers     int      `json:"workers"`
-	ShortDesc   string   `json:"short_desc"`
-	Description string   `json:"description"`
-	Country     string   `json:"country"`
+	ID          int              `json:"id"`
+	Name        string           `json:"name"`
+	Categories  []CategoriesData `json:"categories"`
+	ImageURL    string           `json:"image_url"`
+	WebsiteURL  string           `json:"website_url"`
+	Workers     int              `json:"workers"`
+	ShortDesc   string           `json:"short_desc"`
+	Description string           `json:"description"`
+	Country     string           `json:"country"`
 }
 
 func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, pathV string) (CoopDetails, error) {
@@ -27,7 +32,7 @@ func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, pathV string) (CoopDetail
 		SELECT
 			c.id,
 			cd.name,
-			JSONB_AGG(cat.name) AS categories,
+			JSONB_AGG(JSONB_BUILD_OBJECT('id', cat.id, 'name', cat.name)) AS categories,
 			cd.image_url as image_url,
 			cd.website_url AS website_url,
 			cd.workers AS workers,
@@ -45,7 +50,7 @@ func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, pathV string) (CoopDetail
 			cd.id = cdt.coop_id
 		WHERE
 			c.slug = 'agraria'
-			AND cdt.language_id = 1
+			AND cdt.language_id = 2
 		GROUP BY
 			c.id, 
 			cd.name, 

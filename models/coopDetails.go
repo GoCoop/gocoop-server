@@ -25,8 +25,12 @@ type CoopDetails struct {
 	Country     string           `json:"country"`
 }
 
-func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, pathV string) (CoopDetails, error) {
-	fmt.Println(pathV)
+type Params struct {
+	Slug   string
+	LangId int
+}
+
+func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, params Params) (CoopDetails, error) {
 
 	query := `
 		SELECT
@@ -49,8 +53,8 @@ func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, pathV string) (CoopDetail
 		JOIN t_coop_details_translations cdt ON
 			cd.id = cdt.coop_id
 		WHERE
-			c.slug = 'agraria'
-			AND cdt.language_id = 2
+			c.slug = $1 
+			AND cdt.language_id = $2
 		GROUP BY
 			c.id, 
 			cd.name, 
@@ -61,7 +65,7 @@ func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, pathV string) (CoopDetail
 			cdt.description,
 			cdt.country;`
 
-	rows, err := db.Query(context.Background(), query)
+	rows, err := db.Query(context.Background(), query, params.Slug, params.LangId)
 	if err != nil {
 		return CoopDetails{}, fmt.Errorf("unable to query coop details: %w", err)
 	}

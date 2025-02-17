@@ -14,7 +14,7 @@ type Categories struct {
 	Icon string `json:"icon"`
 }
 
-func GetCategories(db *pgxpool.Pool) ([]Categories, error) {
+func GetCategories(db *pgxpool.Pool, langId int) ([]Categories, error) {
 
 	query := `
 		SELECT 
@@ -25,10 +25,10 @@ func GetCategories(db *pgxpool.Pool) ([]Categories, error) {
 		JOIN t_categories_translations ct ON
 			c.id = ct.category_id
 		WHERE
-			ct.language_id = 1
+			ct.language_id = $1
 	`
 
-	rows, err := db.Query(context.Background(), query)
+	rows, err := db.Query(context.Background(), query, langId)
 	if err != nil {
 		return nil, fmt.Errorf("unabled to query categories: %w", err)
 	}

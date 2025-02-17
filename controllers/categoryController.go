@@ -5,12 +5,24 @@ import (
 	"gocoop-server/models"
 	"log"
 	"net/http"
+
+	"github.com/timewasted/go-accept-headers"
 )
 
 func (s *Server) GetCategories(w http.ResponseWriter, req *http.Request) {
 	log.Println("> GET request to /categories")
+	acceptLang := req.Header.Get("Accept-Language")
 
-	categories, err := models.GetCategories(s.DB)
+	defaultLang := "en-US"
+
+	if acceptLang != "" {
+		l := accept.Parse(acceptLang)
+		defaultLang = l[0].Type
+	}
+
+	langId := returnLangId(defaultLang)
+
+	categories, err := models.GetCategories(s.DB, langId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{

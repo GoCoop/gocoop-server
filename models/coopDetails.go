@@ -11,6 +11,7 @@ import (
 type CategoriesData struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
+	Icon string `json:"icon"`
 }
 
 type CoopDetails struct {
@@ -36,7 +37,7 @@ func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, params Params) (CoopDetai
 		SELECT
 			c.id,
 			cd.name,
-			JSONB_AGG(JSONB_BUILD_OBJECT('id', cat.id, 'name', cat.name)) AS categories,
+			JSONB_AGG(JSONB_BUILD_OBJECT('id', cat.id, 'name', catT.name, 'icon', cat.name)) AS categories,
 			cd.image_url as image_url,
 			cd.website_url AS website_url,
 			cd.workers AS workers,
@@ -50,6 +51,9 @@ func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, params Params) (CoopDetai
 			cc.coop_id = c.id
 		JOIN t_categories cat ON
 			cat.id = cc.category_id
+		LEFT JOIN t_categories_translations catT ON
+			catT.category_id = cc.category_id
+			AND catT.language_id = $2
 		JOIN t_coop_details_translations cdt ON
 			cd.id = cdt.coop_id
 		WHERE
@@ -63,8 +67,8 @@ func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, params Params) (CoopDetai
 			cd.workers,
 			cdt.short_desc,
 			cdt.description,
-			cdt.country;`
-
+			cdt.country;
+		`
 	rows, err := db.Query(context.Background(), query, params.Slug, params.LangId)
 	if err != nil {
 		return CoopDetails{}, fmt.Errorf("unable to query coop details: %w", err)

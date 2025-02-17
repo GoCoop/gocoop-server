@@ -11,7 +11,7 @@ import (
 
 func (s *Server) GetCoopDetails(w http.ResponseWriter, req *http.Request) {
 	slug := req.PathValue("slug")
-	acceptLang := req.Header.Get(("Accept-Language"))
+	acceptLang := req.Header.Get("Accept-Language")
 
 	defaultLang := "en-US"
 

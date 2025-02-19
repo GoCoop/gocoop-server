@@ -16,11 +16,12 @@ type locale struct {
 }
 
 var Locales = []locale{
-	{id: 1, name: "pt-BR"},
-	{id: 2, name: "en-US"},
+	{id: 1, name: "pt-br"},
+	{id: 2, name: "en-us"},
 }
 
 func returnLangId(lang string) (id int) {
+	lang = strings.ToLower(lang)
 	for _, l := range Locales {
 		if strings.Contains(l.name, lang) {
 			return l.id

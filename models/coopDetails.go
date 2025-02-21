@@ -26,12 +26,12 @@ type CoopDetails struct {
 	Country     string           `json:"country"`
 }
 
-type Params struct {
+type DetailsParams struct {
 	Slug   string
 	LangId int
 }
 
-func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, params Params) (CoopDetails, error) {
+func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, params DetailsParams) (CoopDetails, error) {
 
 	query := `
 		SELECT

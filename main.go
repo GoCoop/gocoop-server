@@ -3,6 +3,7 @@ package main
 import (
 	"gocoop-server/config"
 	"gocoop-server/controllers"
+	"gocoop-server/middleware"
 	"log"
 	"net/http"
 
@@ -26,6 +27,8 @@ func main() {
 	mux.HandleFunc("GET /coops", s.GetCoops)
 	mux.HandleFunc("GET /coops/{slug}", s.GetCoopDetails)
 
+	handler := middleware.HandleAcceptLang(mux)
+
 	log.Println("> Server started! Running on port 8080.")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	log.Fatal(http.ListenAndServe(":8080", handler))
 }

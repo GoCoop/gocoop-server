@@ -2,27 +2,17 @@ package controllers
 
 import (
 	"encoding/json"
+	"gocoop-server/middleware"
 	"gocoop-server/models"
 	"log"
 	"net/http"
-
-	"github.com/timewasted/go-accept-headers"
 )
 
 func (s *Server) GetCategories(w http.ResponseWriter, req *http.Request) {
 	log.Println("> GET request to /categories")
-	acceptLang := req.Header.Get("Accept-Language")
+	lang, _ := req.Context().Value(middleware.LangKey).(middleware.Locale)
 
-	defaultLang := "en-US"
-
-	if acceptLang != "" {
-		l := accept.Parse(acceptLang)
-		defaultLang = l[0].Type
-	}
-
-	langId := returnLangId(defaultLang)
-
-	categories, err := models.GetCategories(s.DB, langId)
+	categories, err := models.GetCategories(s.DB, lang.Id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{

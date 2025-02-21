@@ -17,7 +17,13 @@ type Coops struct {
 	ImageURL  string `json:"image_url"`
 }
 
-func GetCoops(db *pgxpool.Pool) ([]Coops, error) {
+type SearchParams struct {
+	Query    string
+	Category string
+	LangId   int
+}
+
+func GetCoops(db *pgxpool.Pool, params SearchParams) ([]Coops, error) {
 	query := `
 		SELECT
 			c.id,
@@ -36,12 +42,18 @@ func GetCoops(db *pgxpool.Pool) ([]Coops, error) {
 		JOIN t_categories cat ON
 			cat.id = cc.category_id
 		WHERE
-			c.slug LIKE '%agraria%'
-			AND cdt.language_id = 2
-			AND cat.id = 1
-		`
+			c.slug LIKE '%' || $1 || '%' AND cat.name = $2 
+			AND cdt.language_id = $3	
+	`
 
-	rows, err := db.Query(context.Background(), query)
+	rows, err := db.Query(
+		context.Background(),
+		query,
+		params.Query,
+		params.Category,
+		params.LangId,
+	)
+
 	if err != nil {
 		return nil, fmt.Errorf("unabled to query coops: %w", err)
 	}

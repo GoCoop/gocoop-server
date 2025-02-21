@@ -2,26 +2,17 @@ package controllers
 
 import (
 	"encoding/json"
+	"gocoop-server/middleware"
 	"gocoop-server/models"
 	"log"
 	"net/http"
-
-	"github.com/timewasted/go-accept-headers"
 )
 
 func (s *Server) GetCoopDetails(w http.ResponseWriter, req *http.Request) {
 	slug := req.PathValue("slug")
-	acceptLang := req.Header.Get("Accept-Language")
+	lang, _ := req.Context().Value(middleware.LangKey).(middleware.Locale)
 
-	defaultLang := "en-US"
-
-	if acceptLang != "" {
-		l := accept.Parse(acceptLang)
-		defaultLang = l[0].Type
-	}
-
-	langId := returnLangId(defaultLang)
-	params := models.Params{Slug: slug, LangId: langId}
+	params := models.DetailsParams{Slug: slug, LangId: lang.Id}
 
 	log.Printf("> GET request to /coops/%s\n", slug)
 

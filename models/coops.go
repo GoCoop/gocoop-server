@@ -8,13 +8,18 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+type categories struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 type Coops struct {
-	ID        int    `json:"id"`
-	Slug      string `json:"slug"`
-	Name      string `json:"name"`
-	Category  string `json:"category"`
-	ShortDesc string `json:"short_desc"`
-	ImageURL  string `json:"image_url"`
+	ID         int          `json:"id"`
+	Slug       string       `json:"slug"`
+	Name       string       `json:"name"`
+	Categories []categories `json:"categories"`
+	ShortDesc  string       `json:"short_desc"`
+	ImageURL   string       `json:"image_url"`
 }
 
 type SearchParams struct {
@@ -25,13 +30,13 @@ type SearchParams struct {
 
 func GetCoops(db *pgxpool.Pool, params SearchParams) ([]Coops, error) {
 	query := `
-		SELECT
+		SELECT 
 			c.id,
 			c.slug,
 			cd.name,
-			cat.name AS category,
-			cd.image_url,
-			cdt.short_desc
+			JSONB_AGG(JSONB_BUILD_OBJECT('id', cat.id, 'name', cat.name)) AS categories,
+			MAX(cd.image_url) AS image_url,
+			MAX(cdt.short_desc) AS short_desc
 		FROM t_coops c 
 		JOIN t_coop_details cd ON
 			cd.id = c.id
@@ -42,9 +47,9 @@ func GetCoops(db *pgxpool.Pool, params SearchParams) ([]Coops, error) {
 		JOIN t_categories cat ON
 			cat.id = cc.category_id
 		WHERE
-			c.slug LIKE '%' || $1 || '%' AND cat.name = $2 
-			AND cdt.language_id = $3	
-	`
+			(c.slug LIKE '%' || $1 || '%' AND cat.name LIKE '%' || $2 || '') 
+			AND cdt.language_id = $3
+		GROUP by c.id, c.slug, cd.name;`
 
 	rows, err := db.Query(
 		context.Background(),

@@ -26,6 +26,7 @@ func GetCategories(db *pgxpool.Pool, langId int) ([]Categories, error) {
 			c.id = ct.category_id
 		WHERE
 			ct.language_id = $1
+		ORDER BY ct.name;
 	`
 
 	rows, err := db.Query(context.Background(), query, langId)

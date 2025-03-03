@@ -9,9 +9,10 @@ import (
 )
 
 type CategoriesData struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	Icon string `json:"icon"`
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Label string `json:"label"`
+	Icon  string `json:"icon"`
 }
 
 type CoopDetails struct {
@@ -37,7 +38,7 @@ func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, params DetailsParams) (Co
 		SELECT
 			c.id,
 			cd.name,
-			JSONB_AGG(JSONB_BUILD_OBJECT('id', cat.id, 'name', catT.name, 'icon', cat.name)) AS categories,
+			JSONB_AGG(JSONB_BUILD_OBJECT('id', cat.id, 'name', catT.name, 'label', cat.name, 'icon', cat.icon)) AS categories,
 			cd.image_url as image_url,
 			cd.website_url AS website_url,
 			cd.workers AS workers,

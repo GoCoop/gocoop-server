@@ -9,9 +9,10 @@ import (
 )
 
 type Categories struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	Icon string `json:"icon"`
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Label string `json:"label"`
+	Icon  string `json:"icon"`
 }
 
 func GetCategories(db *pgxpool.Pool, langId int) ([]Categories, error) {
@@ -20,7 +21,8 @@ func GetCategories(db *pgxpool.Pool, langId int) ([]Categories, error) {
 		SELECT 
 			c.id,
 			ct.name,
-			c.name AS icon
+			c.name AS label,
+			c.icon
 		FROM t_categories c
 		JOIN t_categories_translations ct ON
 			c.id = ct.category_id

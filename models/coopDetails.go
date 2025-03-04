@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type CategoriesData struct {
+type categoriesData struct {
 	ID    int    `json:"id"`
 	Name  string `json:"name"`
 	Label string `json:"label"`
@@ -18,7 +18,7 @@ type CategoriesData struct {
 type CoopDetails struct {
 	ID          int              `json:"id"`
 	Name        string           `json:"name"`
-	Categories  []CategoriesData `json:"categories"`
+	Categories  []categoriesData `json:"categories"`
 	ImageURL    string           `json:"image_url"`
 	WebsiteURL  string           `json:"website_url"`
 	Workers     int              `json:"workers"`

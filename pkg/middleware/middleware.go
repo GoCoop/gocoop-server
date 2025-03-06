@@ -39,8 +39,7 @@ func HandleAcceptLang(next http.Handler) http.Handler {
 		userLang := Locales[1]
 		if lang != "" {
 			l := accept.Parse(lang)
-			lang = l[0].Type
-			langId := returnLangId(lang)
+			langId := returnLangId(l[0].Type)
 			userLang = Locale{Id: langId, Name: lang}
 		}
 		ctx := context.WithValue(req.Context(), LangKey, userLang)

@@ -1,4 +1,4 @@
-package config
+package database
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func ConnectToDatabase() *pgxpool.Pool {
+func Connect() *pgxpool.Pool {
 
 	var (
 		dbHost     = os.Getenv("DB_HOST")

@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
-	"gocoop-server/middleware"
-	"gocoop-server/models"
+	"gocoop-server/pkg/middleware"
+	"gocoop-server/pkg/models"
+	"gocoop-server/pkg/services"
 	"log"
 	"net/http"
 )
@@ -16,8 +17,7 @@ func (s *Server) GetCoopDetails(w http.ResponseWriter, req *http.Request) {
 
 	log.Printf("> GET request to /coops/%s\n", slug)
 
-	details := models.CoopDetails{}
-	coopDetails, err := details.GetCoopDetails(s.DB, params)
+	coopDetails, err := services.GetCoopDetails(s.DB, params)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{

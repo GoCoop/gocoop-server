@@ -1,9 +1,9 @@
 package main
 
 import (
-	"gocoop-server/config"
-	"gocoop-server/controllers"
-	"gocoop-server/middleware"
+	"gocoop-server/pkg/controllers"
+	"gocoop-server/pkg/database"
+	"gocoop-server/pkg/middleware"
 	"log"
 	"net/http"
 
@@ -16,7 +16,7 @@ func main() {
 		log.Fatal("Error loading .env file.")
 	}
 
-	dbPool := config.ConnectToDatabase()
+	dbPool := database.Connect()
 	defer dbPool.Close()
 
 	s := controllers.Server{DB: dbPool}

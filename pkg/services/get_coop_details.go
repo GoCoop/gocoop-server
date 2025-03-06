@@ -1,38 +1,15 @@
-package models
+package services
 
 import (
 	"context"
 	"fmt"
+	"gocoop-server/pkg/models"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type categoriesData struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Label string `json:"label"`
-	Icon  string `json:"icon"`
-}
-
-type CoopDetails struct {
-	ID          int              `json:"id"`
-	Name        string           `json:"name"`
-	Categories  []categoriesData `json:"categories"`
-	ImageURL    string           `json:"image_url"`
-	WebsiteURL  string           `json:"website_url"`
-	Workers     int              `json:"workers"`
-	ShortDesc   string           `json:"short_desc"`
-	Description string           `json:"description"`
-	Country     string           `json:"country"`
-}
-
-type DetailsParams struct {
-	Slug   string
-	LangId int
-}
-
-func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, params DetailsParams) (CoopDetails, error) {
+func GetCoopDetails(db *pgxpool.Pool, params models.DetailsParams) (models.CoopDetails, error) {
 
 	query := `
 		SELECT
@@ -72,13 +49,13 @@ func (c *CoopDetails) GetCoopDetails(db *pgxpool.Pool, params DetailsParams) (Co
 		`
 	rows, err := db.Query(context.Background(), query, params.Slug, params.LangId)
 	if err != nil {
-		return CoopDetails{}, fmt.Errorf("unable to query coop details: %w", err)
+		return models.CoopDetails{}, fmt.Errorf("unable to query coop details: %w", err)
 	}
 	defer rows.Close()
 
-	details, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[CoopDetails])
+	details, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[models.CoopDetails])
 	if err != nil {
-		return CoopDetails{}, fmt.Errorf("unable to collect one row coop details: %w", err)
+		return models.CoopDetails{}, fmt.Errorf("unable to collect one row coop details: %w", err)
 	}
 
 	return details, nil

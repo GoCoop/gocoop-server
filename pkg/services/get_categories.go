@@ -1,21 +1,15 @@
-package models
+package services
 
 import (
 	"context"
 	"fmt"
+	"gocoop-server/pkg/models"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type Categories struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Label string `json:"label"`
-	Icon  string `json:"icon"`
-}
-
-func GetCategories(db *pgxpool.Pool, langId int) ([]Categories, error) {
+func GetCategories(db *pgxpool.Pool, langId int) ([]models.Categories, error) {
 
 	query := `
 		SELECT 
@@ -37,7 +31,7 @@ func GetCategories(db *pgxpool.Pool, langId int) ([]Categories, error) {
 	}
 	defer rows.Close()
 
-	categories, err := pgx.CollectRows(rows, pgx.RowToStructByName[Categories])
+	categories, err := pgx.CollectRows(rows, pgx.RowToStructByName[models.Categories])
 	if err != nil {
 		return nil, fmt.Errorf("unabled to collect rows categories: %w", err)
 	}

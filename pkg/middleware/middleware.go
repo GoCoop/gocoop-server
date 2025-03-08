@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/timewasted/go-accept-headers"
@@ -33,16 +34,35 @@ func returnLangId(lang string) (id int) {
 	return Locales[1].Id
 }
 
-func HandleAcceptLang(next http.Handler) http.Handler {
+func HandleAcceptLang(w http.ResponseWriter, req *http.Request) context.Context {
+	lang := req.Header.Get("Accept-Language")
+	userLang := Locales[1]
+
+	if lang != "" {
+		l := accept.Parse(lang)
+		langId := returnLangId(l[0].Type)
+		userLang = Locale{Id: langId, Name: lang}
+	}
+
+	ctx := context.WithValue(req.Context(), LangKey, userLang)
+	return ctx
+}
+
+func CORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		lang := req.Header.Get("Accept-Language")
-		userLang := Locales[1]
-		if lang != "" {
-			l := accept.Parse(lang)
-			langId := returnLangId(l[0].Type)
-			userLang = Locale{Id: langId, Name: lang}
+
+		ALLOWED_ORIGIN := os.Getenv("ALLOWED_ORIGIN")
+
+		w.Header().Set("Access-Control-Allow-Origin", ALLOWED_ORIGIN)
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if req.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
 		}
-		ctx := context.WithValue(req.Context(), LangKey, userLang)
+
+		ctx := HandleAcceptLang(w, req)
 		next.ServeHTTP(w, req.WithContext(ctx))
 	})
 }

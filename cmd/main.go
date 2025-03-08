@@ -30,7 +30,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:           ":8080",
-		Handler:        middleware.CORS(mux),
+		Handler:        middleware.Wrapper(mux),
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,

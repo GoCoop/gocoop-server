@@ -5,5 +5,5 @@ import (
 )
 
 func Wrapper(next http.Handler) http.Handler {
-	return CORS(HandleAcceptLang(next))
+	return CORS(HandleAcceptLang(RateLimit(next)))
 }

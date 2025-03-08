@@ -23,18 +23,18 @@ var (
 	limiterInstance = limiter.New(store, rate)
 )
 
-func getIP(r *http.Request) string {
-	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+func getIP(req *http.Request) string {
+	ip, _, err := net.SplitHostPort(req.RemoteAddr)
 	if err != nil {
-		return r.RemoteAddr
+		return req.RemoteAddr
 	}
 	return ip
 }
 
 func RateLimit(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		clientIP := getIP(r)
-		context, err := limiterInstance.Get(r.Context(), clientIP)
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		clientIP := getIP(req)
+		context, err := limiterInstance.Get(req.Context(), clientIP)
 		if err != nil {
 			http.Error(w, "Error handling rate limit.", http.StatusInternalServerError)
 			return
@@ -53,6 +53,6 @@ func RateLimit(next http.Handler) http.Handler {
 			return
 		}
 
-		next.ServeHTTP(w, r)
+		next.ServeHTTP(w, req)
 	})
 }

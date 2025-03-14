@@ -24,6 +24,9 @@ func main() {
 
 	mux := http.NewServeMux()
 
+	fs := http.FileServer(http.Dir("../media"))
+	mux.Handle("/media/", http.StripPrefix("/media/", fs))
+
 	mux.HandleFunc("GET /categories", s.GetCategories)
 	mux.HandleFunc("GET /coops", s.GetCoops)
 	mux.HandleFunc("GET /coops/{slug}", s.GetCoopDetails)

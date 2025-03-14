@@ -6,6 +6,7 @@ import (
 	"gocoop-server/pkg/middleware"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -32,13 +33,13 @@ func main() {
 	mux.HandleFunc("GET /coops/{slug}", s.GetCoopDetails)
 
 	server := &http.Server{
-		Addr:           ":8080",
+		Addr:           os.Getenv("APP_PORT"),
 		Handler:        middleware.Wrapper(mux),
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	log.Println("> Server started! Running on port 8080.")
+	log.Printf("> Server started! Running on port %s.\n", os.Getenv("APP_PORT"))
 	log.Fatal(server.ListenAndServe())
 }

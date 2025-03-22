@@ -28,7 +28,14 @@ func GetCoops(db *pgxpool.Pool, params models.SearchParams) ([]models.Coops, err
 		JOIN t_categories cat ON
 			cat.id = cc.category_id
 		WHERE
-			(c.slug LIKE '%' || $1 || '%' AND cat.name LIKE '%' || $2 || '') 
+			(
+				c.slug LIKE '%' || $1 || '%'
+				OR TRANSLATE(cd.name, 'áãéêíóôúüçñÁÃÉÊÍÓÔÚÜÇÑ', 'aaeeioouucnAAEEIOOUUCN') 
+					ILIKE '%' || TRANSLATE($1, 'áãéêíóôúüçñÁÃÉÊÍÓÔÚÜÇÑ', 'aaeeioouucnAAEEIOOUUCN') || '%'
+				OR TRANSLATE(cdt.short_desc, 'áãéêíóôúüçñÁÃÉÊÍÓÔÚÜÇÑ', 'aaeeioouucnAAEEIOOUUCN')
+					ILIKE '%' || TRANSLATE($1, 'áãéêíóôúüçñÁÃÉÊÍÓÔÚÜÇÑ', 'aaeeioouucnAAEEIOOUUCN') || '%'
+			)
+			AND cat.name LIKE '%' || $2 || ''
 			AND cdt.language_id = $3
 		GROUP by c.id, c.slug, cd.name;`
 

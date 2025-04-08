@@ -15,6 +15,7 @@ func GetCoopDetails(db *pgxpool.Pool, params models.DetailsParams) (models.CoopD
 		SELECT
 			c.id,
 			cd.name,
+			BOOL_OR(cv.is_verified) AS is_verified,
 			JSONB_AGG(JSONB_BUILD_OBJECT('id', cat.id, 'name', catT.name, 'label', cat.name, 'icon', cat.icon)) AS categories,
 			cd.image_url as image_url,
 			cd.website_url AS website_url,
@@ -23,6 +24,8 @@ func GetCoopDetails(db *pgxpool.Pool, params models.DetailsParams) (models.CoopD
 			cdt.description,
 			cdt.country
 		FROM t_coops c
+		JOIN t_coops_verified cv ON
+			c.id = cv.coop_id
 		JOIN t_coop_details cd ON
 			c.id = cd.id
 		JOIN t_coops_categories cc ON
@@ -35,7 +38,7 @@ func GetCoopDetails(db *pgxpool.Pool, params models.DetailsParams) (models.CoopD
 		JOIN t_coop_details_translations cdt ON
 			cd.id = cdt.coop_id
 		WHERE
-			c.slug = $1 
+			c.slug = $1
 			AND cdt.language_id = $2
 		GROUP BY
 			c.id, 

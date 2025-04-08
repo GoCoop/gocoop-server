@@ -9,6 +9,7 @@ type Coops struct {
 	ID         int          `json:"id"`
 	Slug       string       `json:"slug"`
 	Name       string       `json:"name"`
+	IsVerified bool         `json:"is_verified"`
 	Categories []categories `json:"categories"`
 	ShortDesc  string       `json:"short_desc"`
 	ImageURL   string       `json:"image_url"`

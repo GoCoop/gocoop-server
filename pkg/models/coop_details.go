@@ -10,6 +10,7 @@ type categoriesData struct {
 type CoopDetails struct {
 	ID          int              `json:"id"`
 	Name        string           `json:"name"`
+	IsVerified  bool             `json:"is_verified"`
 	Categories  []categoriesData `json:"categories"`
 	ImageURL    string           `json:"image_url"`
 	WebsiteURL  string           `json:"website_url"`

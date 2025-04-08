@@ -17,8 +17,11 @@ func GetCoops(db *pgxpool.Pool, params models.SearchParams) ([]models.Coops, err
 			cd.name,
 			JSONB_AGG(JSONB_BUILD_OBJECT('id', cat.id, 'name', cat.name)) AS categories,
 			MAX(cd.image_url) AS image_url,
-			MAX(cdt.short_desc) AS short_desc
+			MAX(cdt.short_desc) AS short_desc,
+			BOOL_OR(cv.is_verified) AS is_verified
 		FROM t_coops c 
+		JOIN t_coops_verified cv ON
+			c.id = cv.coop_id
 		JOIN t_coop_details cd ON
 			cd.id = c.id
 		JOIN t_coop_details_translations cdt ON
@@ -37,7 +40,8 @@ func GetCoops(db *pgxpool.Pool, params models.SearchParams) ([]models.Coops, err
 			)
 			AND cat.name LIKE '%' || $2 || ''
 			AND cdt.language_id = $3
-		GROUP by c.id, c.slug, cd.name;`
+		GROUP by c.id, c.slug, cd.name
+		ORDER BY cd.name;`
 
 	rows, err := db.Query(
 		context.Background(),
